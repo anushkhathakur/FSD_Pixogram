@@ -1,0 +1,13 @@
+<div class="card">
+    <div class="card-header">     <img src="assets/image/files.jpg" alt="Logo"
+      class="mr-3 mt-3 rounded-circle" style="width: 60px;">My Files</div>
+    <ul class="list-group list-group-flush" *ngFor="let media of fileInfos | async">
+      <li class="list-group-item">
+        <h5>
+       Title : {{ media.mediaTitle }} <br><br>
+        <img src="{{ media.mediaUrl }}" alt="Image" class="mr-3 mt-3 rounded-circle" style="width: 90px;">
+       <br><br> Description : {{ media.mediaCaption }}<br><br>
+        </h5> 
+      </li>
+    </ul>
+  </div>

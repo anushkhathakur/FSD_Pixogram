@@ -1,0 +1,17 @@
+<div class="form-group">
+  <img src="assets/image/upload.png" alt="Logo" class="mr-3 mt-3 rounded-circle" style="width: 60px;">
+  <br>
+  <label for="mediaTitle">Title</label>
+  <input type="text" class="form-control" name="mediaTitle" [(ngModel)]="form.mediaTitle" required minlength="20"
+    maxlength="20" #mediaTitle="ngModel" />
+  <label for="desc">Description</label>
+  <input type="text" class="form-control" name="desc" [(ngModel)]="form.desc" required minlength="40" maxlength="60"
+    #desc="ngModel" />
+  <label class="btn btn-default">
+    <input type="file" (change)="selectFile($event)" />
+  </label>
+  <button class="btn btn-success" [disabled]="!selectedFiles" (click)="upload()">
+    Upload
+  </button>
+  <div class="alert alert-light" role="alert">{{ message }}</div>
+</div>
