@@ -32,6 +32,10 @@ import com.pixogram.users.repository.UserRepository;
 import com.pixogram.users.security.jwt.JwtUtils;
 import com.pixogram.users.security.services.UserDetailsImpl;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/users")
@@ -51,6 +55,11 @@ public class AuthController {
 	@Autowired
 	JwtUtils jwtUtils;
 
+	/***
+	 * Rest api to sign in 
+	 * @param loginRequest
+	 * @return
+	 */
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -67,7 +76,12 @@ public class AuthController {
 		return ResponseEntity.ok(
 				new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles));
 	}
-
+	
+	/***
+	 * Rest api to sign up
+	 * @param signUpRequest
+	 * @return
+	 */
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {

@@ -8,6 +8,10 @@ import org.springframework.stereotype.Repository;
 import com.pixogram.users.models.ERole;
 import com.pixogram.users.models.Role;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
 	Optional<Role> findByName(ERole name);

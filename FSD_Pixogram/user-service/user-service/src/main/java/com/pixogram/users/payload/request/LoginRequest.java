@@ -2,6 +2,10 @@ package com.pixogram.users.payload.request;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 public class LoginRequest {
 	@NotBlank
 	private String username;

@@ -7,6 +7,10 @@ import org.springframework.stereotype.Repository;
 
 import com.pixogram.users.models.User;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 	Optional<User> findByUsername(String username);

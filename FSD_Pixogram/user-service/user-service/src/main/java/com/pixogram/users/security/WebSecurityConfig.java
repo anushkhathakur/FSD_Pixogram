@@ -18,6 +18,10 @@ import com.pixogram.users.security.jwt.AuthEntryPointJwt;
 import com.pixogram.users.security.jwt.AuthTokenFilter;
 import com.pixogram.users.security.services.UserDetailsServiceImpl;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(

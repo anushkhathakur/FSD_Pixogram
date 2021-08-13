@@ -7,6 +7,10 @@ import org.springframework.stereotype.Repository;
 
 import com.pixogram.media.entity.Media;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 @Repository
 public interface MediaRepository extends JpaRepository<Media, Long> {
 

@@ -2,6 +2,10 @@ package com.pixogram.users.payload.response;
 
 import java.util.List;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 public class JwtResponse {
 	private String token;
 	private String type = "Bearer";

@@ -4,6 +4,10 @@ import java.util.Set;
 
 import javax.validation.constraints.*;
  
+/**
+ * @author Anushkha Thakur
+ *
+ */
 public class SignupRequest {
     @NotBlank
     @Size(min = 3, max = 20)

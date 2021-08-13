@@ -2,6 +2,10 @@ package com.pixogram.users.models;
 
 import javax.persistence.*;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 @Entity
 @Table(name = "roles")
 public class Role {

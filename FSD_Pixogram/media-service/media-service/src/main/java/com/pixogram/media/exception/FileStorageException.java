@@ -1,5 +1,9 @@
 package com.pixogram.media.exception;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 public class FileStorageException extends RuntimeException {
     public FileStorageException(String message) {
         super(message);

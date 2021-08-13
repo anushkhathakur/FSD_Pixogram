@@ -8,6 +8,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 @SpringBootApplication(exclude = {SpringApplicationAdminJmxAutoConfiguration.class,JmxAutoConfiguration.class})
 @EnableEurekaClient
 @EnableConfigurationProperties

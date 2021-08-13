@@ -19,6 +19,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.pixogram.users.security.services.UserDetailsServiceImpl;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 public class AuthTokenFilter extends OncePerRequestFilter {
 	@Autowired
 	private JwtUtils jwtUtils;

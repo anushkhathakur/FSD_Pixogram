@@ -3,6 +3,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,5 +18,4 @@ public class SingleMediaRequest {
     private String [] tags;
     private String [] effect;
     private String fileName;
-    //private MultipartFile file;
 }

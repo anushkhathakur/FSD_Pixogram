@@ -1,15 +1,12 @@
 package com.pixogram.media.controller;
 
 import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,12 +33,15 @@ import com.pixogram.media.service.MediaService;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 @RestController
 @RequestMapping("/producer/media")
 @Slf4j
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class MediaController {
-	private final Path root = Paths.get("uploads");
 	@Autowired
 	private MediaService mediaService;
 
@@ -50,96 +50,31 @@ public class MediaController {
 		return "Feign Producer is working fine ";
 	}
 
-	@RequestMapping(value = "/singleFileUpload", method = RequestMethod.POST, consumes = { "multipart/form-data" })
-	public ResponseEntity<ResponseMessage> uploadSingleFile(
-			@RequestPart("singleMediaRequest") String singleMediaRequest, @RequestPart("file") MultipartFile file) {
-		try {
-			SingleMediaRequest singleMediaRequestEntity = new ObjectMapper().readValue(singleMediaRequest,
-					SingleMediaRequest.class);
-
-			log.info("inside upload api -uploadFile method ");
-			System.out.println("file.getOriginalFilename():" + file.getOriginalFilename());
-			mediaService.uploadFile(singleMediaRequestEntity, file);
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(new ResponseMessage("Uploaded the file successfully: " + file.getOriginalFilename()));
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
-					.body(new ResponseMessage("Could not upload the file: " + file.getOriginalFilename() + "!"));
-		}
-	}
-
-	@PostMapping(value = "/multipleFileUpload")
-	public ResponseEntity<ResponseMessage> uploadMultipleFile(
-			@ModelAttribute MultipleMediaRequest multipleMediaRequest) {
-		System.out.println("media-service : uploadMultipleFile method called..");
-
-		log.info("Inside uploadMultipleFile method of MediaController.....");
-		// MultipleMediaRequest singleMediaRequestEntity = new
-		// ObjectMapper().readValue(multipleMediaRequest, MultipleMediaRequest.class);
-		try {
-			for (SingleMediaRequest mediaDTO : multipleMediaRequest.getMediaList()) {
-				// String fileName = mediaDTO.getFile().getOriginalFilename();
-				// System.out.println("fileName:" + fileName);
-				// mediaService.uploadFile(mediaDTO);
-			}
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(new ResponseMessage("Uploaded multiple files successfully"));
-		} catch (Exception e) {
-			e.printStackTrace();
-			log.error(e.getMessage());
-			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
-					.body(new ResponseMessage("Could not upload the file: !"));
-		}
-	}
-
-	@GetMapping(value = "/allMediaByUserId/{userId}")
-	public ResponseEntity<?> findMediaByUserId(@PathVariable("userId") Long userId) {
-		log.info("Inside findMediaById method of MediaController");
-		List<ConsumerMediaDTO> consumerMediaDTOList = new ArrayList<ConsumerMediaDTO>();
-		List<Media> mediaList = mediaService.findMediaByUserId(userId);
-		for (Media media : mediaList) {
-			ConsumerMediaDTO consumerMediaDTO = new ConsumerMediaDTO();
-			consumerMediaDTO.setHide(media.isHide());
-			consumerMediaDTO.setMediaCaption(media.getMediaCaption());
-			consumerMediaDTO.setMediaId(media.getMediaId());
-			consumerMediaDTO.setMediaTitle(media.getMediaTitle());
-			consumerMediaDTO.setMediaUrl(media.getMediaUrl());
-			consumerMediaDTO.setMimeType(media.getMimeType());
-			consumerMediaDTO.setName(media.getName());
-			consumerMediaDTO.setUploadedDateTime(media.getDate());
-			consumerMediaDTO.setUserId(media.getUserId());
-			consumerMediaDTOList.add(consumerMediaDTO);
-		}
-		return ResponseEntity.ok(consumerMediaDTOList);
-	}
-
+	/***
+	 * Rest Api to retrieve all files
+	 * 
+	 * @return
+	 */
 	@GetMapping("/files")
 	public ResponseEntity<List<ConsumerMediaDTO>> getListFiles() {
+		log.info("files api executing..");
 		List<FileInfo> filePathInfos = mediaService.loadAll().map(path -> {
 			String filename = path.getFileName().toString();
 			String url = MvcUriComponentsBuilder
 					.fromMethodName(MediaController.class, "getFile", path.getFileName().toString()).build().toString();
-
 			return new FileInfo(filename, url);
 		}).collect(Collectors.toList());
-		
-		System.out.println("filePathInfos==========>"+filePathInfos);
+
 		List<Media> mediaList = mediaService.getAllFiles();
-		System.out.println("mediaList.size()"+mediaList.size());
 		List<ConsumerMediaDTO> fileInfos = new ArrayList<ConsumerMediaDTO>();
-		for(Media media :mediaList) {
-			System.out.println("getName==>"+media.getName());
-			System.out.println("getMediaUrl====>"+media.getMediaUrl());
-			for(FileInfo fileInfo : filePathInfos){
-				System.out.println("fileInfo.getName()==>"+fileInfo.getName());
-				System.out.println("fileInfo.getUrl()====>"+fileInfo.getUrl());
-				if(fileInfo.getName().equalsIgnoreCase(media.getName())) {
+		for (Media media : mediaList) {
+			for (FileInfo fileInfo : filePathInfos) {
+				if (fileInfo.getName().equalsIgnoreCase(media.getName())) {
 					ConsumerMediaDTO fileDetails = new ConsumerMediaDTO();
 					fileDetails.setHide(media.isHide());
 					fileDetails.setMediaCaption(media.getMediaCaption());
 					fileDetails.setMediaId(media.getMediaId());
 					fileDetails.setMediaTitle(media.getMediaTitle());
-					System.out.println("Url===>"+fileInfo.getUrl());
 					fileDetails.setMediaUrl(fileInfo.getUrl());
 					fileDetails.setMimeType(media.getMimeType());
 					fileDetails.setName(media.getName());
@@ -151,47 +86,48 @@ public class MediaController {
 		}
 		return ResponseEntity.status(HttpStatus.OK).body(fileInfos);
 	}
-	
+
+	/***
+	 * Rest Api to fetch all file details for user
+	 * 
+	 * @param userId
+	 * @return
+	 */
 	@GetMapping("/userfiles/{userId}")
 	public ResponseEntity<List<ConsumerMediaDTO>> getUserListFiles(@PathVariable("userId") String userId) {
-		System.out.println("I am in getUserListFiles-- "+userId);
+		log.info("userfiles api executing with user Id.." + userId);
+		System.out.println("I am in getUserListFiles-- " + userId);
 		List<FileInfo> filePathInfos = mediaService.loadUserFiles(userId).map(path -> {
 			String filename = path.getFileName().toString();
 			String url = MvcUriComponentsBuilder
-					.fromMethodName(MediaController.class, "getUserFile",userId, path.getFileName().toString()).build().toString();
+					.fromMethodName(MediaController.class, "getUserFile", userId, path.getFileName().toString()).build()
+					.toString();
 
 			return new FileInfo(filename, url);
 		}).collect(Collectors.toList());
-		
-		System.out.println("filePathInfos==========>"+filePathInfos);
+
 		List<Media> mediaList = mediaService.findMediaByUserId(Long.valueOf(userId));
-		System.out.println("mediaList.size()"+mediaList.size());
 		List<ConsumerMediaDTO> fileInfos = new ArrayList<ConsumerMediaDTO>();
-		for(Media media :mediaList) {
-			System.out.println("getName==>"+media.getName());
-			System.out.println("getMediaUrl====>"+media.getMediaUrl());
-			for(FileInfo fileInfo : filePathInfos){
-				System.out.println("fileInfo.getName()==>"+fileInfo.getName());
-				System.out.println("fileInfo.getUrl()====>"+fileInfo.getUrl());
-				if(fileInfo.getName().equalsIgnoreCase(media.getName())) {
+		for (Media media : mediaList) {
+			for (FileInfo fileInfo : filePathInfos) {
+				if (fileInfo.getName().equalsIgnoreCase(media.getName())) {
 					ConsumerMediaDTO fileDetails = new ConsumerMediaDTO();
 					fileDetails.setHide(media.isHide());
 					fileDetails.setMediaCaption(media.getMediaCaption());
 					fileDetails.setMediaId(media.getMediaId());
 					fileDetails.setMediaTitle(media.getMediaTitle());
-					System.out.println("Url===>"+fileInfo.getUrl());
 					fileDetails.setMediaUrl(fileInfo.getUrl());
 					fileDetails.setMimeType(media.getMimeType());
 					fileDetails.setName(media.getName());
 					fileDetails.setUploadedDateTime(media.getDate());
 					fileDetails.setUserId(media.getUserId());
 					try {
-						if(mediaService.fileExist(media.getName(), userId)) {
+						if (mediaService.fileExist(media.getName(), userId)) {
 							fileInfos.add(fileDetails);
 						}
 					} catch (MalformedURLException e) {
 						log.error(e.getMessage());
-						e.printStackTrace();
+						return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(fileInfos);
 					}
 				}
 			}
@@ -199,20 +135,84 @@ public class MediaController {
 		return ResponseEntity.status(HttpStatus.OK).body(fileInfos);
 	}
 
+	/***
+	 * Rest API to fetch file with particular file name
+	 * 
+	 * @param filename
+	 * @return
+	 */
 	@GetMapping("/files/{filename:.+}")
 	public ResponseEntity<Resource> getFile(@PathVariable String filename) {
-		System.out.println("Hi I m in getFile-------------------");
+		log.info("files api executing with filename.." + filename);
 		Resource file = mediaService.load(filename);
 		return ResponseEntity.ok()
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
 				.body(file);
 	}
+
+	/***
+	 * Rest Api to fetch file with user id and file name
+	 * 
+	 * @param userId
+	 * @param filename
+	 * @return
+	 */
 	@GetMapping("/files/{userId}/{filename:.+}")
-	public ResponseEntity<Resource> getUserFile(@PathVariable String userId,@PathVariable String filename) {
-		System.out.println("Hi I m in getUserFile-------------------");
-		Resource file = mediaService.loadUserFile(filename,userId);
+	public ResponseEntity<Resource> getUserFile(@PathVariable String userId, @PathVariable String filename) {
+		log.info("files api executing with filename.." + filename + " and userId .." + userId);
+		Resource file = mediaService.loadUserFile(filename, userId);
 		return ResponseEntity.ok()
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
 				.body(file);
 	}
+
+	/**
+	 * Rest API to upload single file and details, @RequestPart attribute is used as
+	 * it was not possible to upload mutipart file from angular
+	 * 
+	 * @param singleMediaRequest
+	 * @param file
+	 * @return
+	 */
+	@RequestMapping(value = "/singleFileUpload", method = RequestMethod.POST, consumes = { "multipart/form-data" })
+	public ResponseEntity<ResponseMessage> uploadSingleFile(
+			@RequestPart("singleMediaRequest") String singleMediaRequest, @RequestPart("file") MultipartFile file) {
+		try {
+			SingleMediaRequest singleMediaRequestEntity = new ObjectMapper().readValue(singleMediaRequest,
+					SingleMediaRequest.class);
+
+			log.info("singleFileUpload api executing..");
+			mediaService.uploadFile(singleMediaRequestEntity, file);
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(new ResponseMessage("Uploaded the file successfully: " + file.getOriginalFilename()));
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
+					.body(new ResponseMessage("Could not upload the file: " + file.getOriginalFilename() + "!"));
+		}
+	}
+
+	/***
+	 * Rest API to upload mutiple file with MultipleMediaRequest object
+	 * 
+	 * @param mediaRequest
+	 * @return
+	 */
+	@PostMapping(value = "/multipleFileUpload")
+	public ResponseEntity<ResponseMessage> multipleFileUpload(
+			@ModelAttribute MultipleMediaRequest mediaRequest) {
+		String message = "Uploaded multiple files successfully";
+		log.info("Inside uploadMultipleFile method of MediaController.....");
+		System.out.println("Inside uploadMultipleFile method of MediaController.....");
+		try {
+			message = mediaService.uploadMutipleFile(mediaRequest);
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error(e.getMessage());
+			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
+					.body(new ResponseMessage("Could not upload the file: !"));
+		}
+	}
+
 }

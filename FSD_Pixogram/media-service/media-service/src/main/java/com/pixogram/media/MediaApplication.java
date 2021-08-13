@@ -10,6 +10,10 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 import com.pixogram.media.service.MediaService;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 @SpringBootApplication(exclude = JmxAutoConfiguration.class)
 @EnableEurekaClient
 public class MediaApplication implements CommandLineRunner {

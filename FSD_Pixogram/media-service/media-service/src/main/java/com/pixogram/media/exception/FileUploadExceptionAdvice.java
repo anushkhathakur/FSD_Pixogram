@@ -9,6 +9,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.pixogram.media.dto.ResponseMessage;
 
+/**
+ * @author Anushkha Thakur
+ *
+ */
 @ControllerAdvice
 public class FileUploadExceptionAdvice extends ResponseEntityExceptionHandler {
 
